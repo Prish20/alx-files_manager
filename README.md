@@ -214,3 +214,78 @@ bash: {error:Missing password}: command not found
 ```
 
 These commands demonstrate successful user creation, database storage, error handling for existing users, and error handling for missing password.
+
+## Task 4: User Authentication
+
+## Overview task 4
+
+This task implements user authentication endpoints in the Files Manager API. It includes functionality for user sign-in, sign-out, and retrieving user information.
+
+## New Endpoints
+
+### 1. GET /connect
+
+- **Controller**: `AuthController.getConnect`
+- **Purpose**: Authenticates a user and generates an authentication token
+- **Authentication**: Basic Auth (Base64 encoded email:password)
+- **Response**:
+  - Success (200): `{ "token": "<generated_token>" }`
+  - Error (401): `{ "error": "Unauthorized" }`
+
+### 2. GET /disconnect
+
+- **Controller**: `AuthController.getDisconnect`
+- **Purpose**: Signs out a user by invalidating their token
+- **Authentication**: Requires `X-Token` header
+- **Response**:
+  - Success (204): No content
+  - Error (401): `{ "error": "Unauthorized" }`
+
+### 3. GET /users/me
+
+- **Controller**: `UsersController.getMe`
+- **Purpose**: Retrieves the authenticated user's information
+- **Authentication**: Requires `X-Token` header
+- **Response**:
+  - Success (200): `{ "id": "<user_id>", "email": "<user_email>" }`
+  - Error (401): `{ "error": "Unauthorized" }`
+
+## Implementation Details for task 4
+
+- **Token Generation**: Uses `uuidv4` to generate unique tokens
+- **Token Storage**: Tokens are stored in Redis with a 24-hour expiration
+- **Password Hashing**: Passwords are stored and compared using SHA1 hashing
+
+## Usage Examples
+
+1. Signing in:
+
+   ```bash
+   curl 0.0.0.0:5000/connect -H "Authorization: Basic Ym9iQGR5bGFuLmNvbTp0b3RvMTIzNCE="
+   ```
+
+2. Retrieving user info:
+
+   ```bash
+   curl 0.0.0.0:5000/users/me -H "X-Token: <your_token>"
+   ```
+
+3. Signing out:
+
+   ```bash
+   curl 0.0.0.0:5000/disconnect -H "X-Token: <your_token>"
+   ```
+
+## Files Modified/Created task 4
+
+- `routes/index.js`: Added new routes
+- `controllers/AuthController.js`: Implemented authentication logic
+- `controllers/UsersController.js`: Added `getMe` method
+- `utils/db.js`: Added methods for user retrieval
+
+## Dependencies for Task 4
+
+- `uuid`: For generating unique tokens
+- `sha1`: For password hashing
+
+Ensure all dependencies are installed by running:

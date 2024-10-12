@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectID } from 'mongodb';
 
 /**
  * Database configuration parameters.
@@ -26,14 +26,15 @@ class DBClient {
     this.usersCollection = null;
     this.filesCollection = null;
 
-    MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
+    this.client = new MongoClient(url, { useUnifiedTopology: true });
+    this.client.connect((err) => {
       if (!err) {
-        this.db = client.db(DB_DATABASE);
+        this.db = this.client.db(DB_DATABASE);
         this.usersCollection = this.db.collection('users');
         this.filesCollection = this.db.collection('files');
       } else {
-        console.error('Failed to connect to MongoDB:', err.message);
-        this.db = null;
+        console.error(err);
+        this.db = false;
       }
     });
   }
@@ -43,7 +44,7 @@ class DBClient {
    * @returns {boolean} True if the connection is alive (this.db is not null), false otherwise.
    */
   isAlive() {
-    return Boolean(this.db);
+    return !!this.db;
   }
 
   /**
@@ -62,6 +63,14 @@ class DBClient {
    */
   async nbFiles() {
     return this.filesCollection.countDocuments();
+  }
+
+  async getUserByEmail(email) {
+    return this.usersCollection.findOne({ email });
+  }
+
+  async getUserById(id) {
+    return this.usersCollection.findOne({ _id: ObjectID(id) });
   }
 }
 
