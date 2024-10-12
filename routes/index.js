@@ -22,5 +22,9 @@ router.get('/users/me', UsersController.getMe);
 /** Define route for uploading files */
 router.post('/files', FilesController.postUpload);
 
+/** Define new routes for getting and listing files */
+router.get('/files/:id', FilesController.getShow);
+router.get('/files', FilesController.getIndex);
+
 /** Export the router for use in the main app */
 export default router;

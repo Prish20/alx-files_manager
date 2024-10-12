@@ -359,3 +359,65 @@ bye
 [adrian@Thinkbook15 alx-files_manager]$ ls /tmp/files_manager/
 94392418-53ed-4693-b8f5-a868a2745d63  fed669e4-e16e-46e8-a591-146f2972c54d
 
+# Task 6: Get and List Files
+
+## Objective
+Implement endpoints to retrieve individual file documents and list file documents with pagination and filtering options.
+
+## New Endpoints
+Two new endpoints have been added to the `routes/index.js` file:
+
+1. `GET /files/:id` => `FilesController.getShow`
+2. `GET /files` => `FilesController.getIndex`
+
+## Implementation Details
+
+### GET /files/:id
+This endpoint retrieves a single file document based on the provided ID.
+
+- **Authentication**: Requires a valid token in the `X-Token` header.
+- **Response**:
+  - `401 Unauthorized`: If the token is invalid or missing.
+  - `404 Not Found`: If no file document is found for the given ID and user.
+  - `200 OK`: Returns the file document if found.
+
+### GET /files
+This endpoint retrieves a list of file documents for the authenticated user, with optional filtering and pagination.
+
+- **Authentication**: Requires a valid token in the `X-Token` header.
+- **Query Parameters**:
+  - `parentId` (optional): Filters files by parent folder. Defaults to '0' (root).
+  - `page` (optional): Specifies the page number for pagination. Starts at 0.
+- **Pagination**: Each page contains a maximum of 20 items.
+- **Response**:
+  - `401 Unauthorized`: If the token is invalid or missing.
+  - `200 OK`: Returns an array of file documents.
+
+## Usage Examples
+
+1. Retrieve a specific file:
+   ```bash
+   curl -XGET 0.0.0.0:5000/files/5f1e8896c7ba06511e683b25 -H "X-Token: f21fb953-16f9-46ed-8d9c-84c6450ec80f"
+   ```
+
+2.List all files:
+
+  ```bash
+   curl -XGET 0.0.0.0:5000/files -H "X-Token: f21fb953-16f9-46ed-8d9c-84c6450ec80f"
+   ```
+
+3.List files in a specific folder:
+
+   ```bash
+   curl -XGET 0.0.0.0:5000/files?parentId=5f1e881cc7ba06511e683b23 -H "X-Token: f21fb953-16f9-46ed-8d9c-84c6450ec80f"
+   ```
+
+## Implementation Files
+
+- `routes/index.js`: Updated with new routes.
+- `controllers/FilesController.js`: Implemented `getShow` and `getIndex` methods.
+
+## Notes task 6
+
+- The `parentId` parameter is not validated. If it doesn't match any user folder, an empty list is returned.
+- Pagination is implemented using MongoDB's aggregation pipeline for efficiency.
