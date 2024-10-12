@@ -62,7 +62,7 @@ This task involves setting up an Express server and implementing two API endpoin
 2. `routes/index.js`: Route definitions
 3. `controllers/AppController.js`: Controller with endpoint implementations
 
-## Implementation Details
+## Implementation Details for Task 2
 
 ### server.js
 
@@ -114,3 +114,100 @@ Implements two methods:
 
 - Ensure that the Redis and database utilities (`utils/redis.js` and `utils/db.js`) are properly implemented with the required methods (`isAlive`, `nbUsers`, `nbFiles`).
 - The server uses JSON for request and response bodies.
+
+## Task 3: User Creation
+
+## Objective
+
+Implement a new endpoint to create users in the database.
+
+## Files Modified/Created
+
+- `routes/index.js`
+- `controllers/UsersController.js`
+
+## Implementation Details
+
+### 1. Route Addition (`routes/index.js`)
+
+Added a new POST route for user creation:
+
+```javascript
+router.post('/users', UsersController.postNew);
+```
+
+### 2. User Controller (`controllers/UsersController.js`)
+
+Created a new controller with the following functionality:
+
+- Endpoint: `POST /users`
+- Purpose: Create a new user in the database
+- Request body requirements:
+  - `email`: User's email address
+  - `password`: User's password
+- Error handling:
+  - Returns 400 status code if email is missing
+  - Returns 400 status code if password is missing
+  - Returns 400 status code if email already exists in the database
+- Password security:
+  - Passwords are hashed using SHA1 before storage
+- Success response:
+  - Returns 201 status code
+  - Returns JSON object with user's id and email
+
+## Usage Example
+
+```bash
+curl 0.0.0.0:5000/users -XPOST -H "Content-Type: application/json" -d '{ "email": "bob@dylan.com", "password": "toto1234!" }'
+```
+
+Expected successful response:
+
+```json
+{"id":"5f1e7d35c7ba06511e683b21","email":"bob@dylan.com"}
+```
+
+## Database Impact
+
+- New users are stored in the `users` collection
+- User document structure:
+
+  ```json
+  {
+    "_id": ObjectId("..."),
+    "email": "user@example.com",
+    "password": "hashed_password_using_sha1"
+  }
+  ```
+
+## Error Responses
+
+- Missing email: `{"error":"Missing email"}`
+- Missing password: `{"error":"Missing password"}`
+- Email already exists: `{"error":"Already exist"}`
+
+## Notes
+
+- Ensure that the MongoDB connection is properly set up in `utils/db.js`
+- The `sha1` package is required for password hashing
+
+## Verification
+You can verify the functionality using the following commands:
+
+```bash
+bob@dylan:~$ curl 0.0.0.0:5000/users -XPOST -H "Content-Type: application/json" -d '{ "email": "bob@dylan.com", "password": "toto1234!" }' ; echo ""
+{"id":"5f1e7d35c7ba06511e683b21","email":"bob@dylan.com"}
+bob@dylan:~$ 
+bob@dylan:~$ echo 'db.users.find()' | mongo files_manager
+{ "_id" : ObjectId("5f1e7d35c7ba06511e683b21"), "email" : "bob@dylan.com", "password" : "89cad29e3ebc1035b29b1478a8e70854f25fa2b2" }
+bob@dylan:~$ 
+bob@dylan:~$ 
+bob@dylan:~$ curl 0.0.0.0:5000/users -XPOST -H "Content-Type: application/json" -d '{ "email": "bob@dylan.com", "password": "toto1234!" }' ; echo ""
+{"error":"Already exist"}
+bob@dylan:~$ 
+bob@dylan:~$ curl 0.0.0.0:5000/users -XPOST -H "Content-Type: application/json" -d '{ "email": "bob@dylan.com" }' ; echo ""
+{"error":"Missing password"}
+bob@dylan:~$ 
+```
+
+These commands demonstrate successful user creation, database storage, error handling for existing users, and error handling for missing password.
