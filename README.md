@@ -186,28 +186,31 @@ Expected successful response:
 - Missing password: `{"error":"Missing password"}`
 - Email already exists: `{"error":"Already exist"}`
 
-## Notes
+## Additional Notes
 
 - Ensure that the MongoDB connection is properly set up in `utils/db.js`
 - The `sha1` package is required for password hashing
 
 ## Verification
+
 You can verify the functionality using the following commands:
 
 ```bash
-bob@dylan:~$ curl 0.0.0.0:5000/users -XPOST -H "Content-Type: application/json" -d '{ "email": "bob@dylan.com", "password": "toto1234!" }' ; echo ""
-{"id":"5f1e7d35c7ba06511e683b21","email":"bob@dylan.com"}
-bob@dylan:~$ 
-bob@dylan:~$ echo 'db.users.find()' | mongo files_manager
-{ "_id" : ObjectId("5f1e7d35c7ba06511e683b21"), "email" : "bob@dylan.com", "password" : "89cad29e3ebc1035b29b1478a8e70854f25fa2b2" }
-bob@dylan:~$ 
-bob@dylan:~$ 
-bob@dylan:~$ curl 0.0.0.0:5000/users -XPOST -H "Content-Type: application/json" -d '{ "email": "bob@dylan.com", "password": "toto1234!" }' ; echo ""
+[adrian@Thinkbook15 alx-files_manager]$ curl 0.0.0.0:5000/users -XPOST -H "Content-Type: application/json" -d '{ "email": "bob@dylan.com", "password": "toto1234!" }' ; echo ""
+{"id":"670a9abf51078577bf0af2fc","email":"bob@dylan.com"}
+[adrian@Thinkbook15 alx-files_manager]$ echo 'db.users.find()' | mongo files_manager
+MongoDB shell version v3.6.23
+connecting to: mongodb://127.0.0.1:27017/files_manager?gssapiServiceName=mongodb
+Implicit session: session { "id" : UUID("3fd206aa-b6c6-4f0f-a2d3-1ebb38cdc296") }
+MongoDB server version: 3.6.23
+{ "_id" : ObjectId("670a9abf51078577bf0af2fc"), "email" : "bob@dylan.com", "password" : "89cad29e3ebc1035b29b1478a8e70854f25fa2b2" }
+bye
+[adrian@Thinkbook15 alx-files_manager]$  curl 0.0.0.0:5000/users -XPOST -H "Content-Type: application/json" -d '{ "email": "bob@dylan.com", "password": "toto1234!" }' ; echo ""
 {"error":"Already exist"}
-bob@dylan:~$ 
-bob@dylan:~$ curl 0.0.0.0:5000/users -XPOST -H "Content-Type: application/json" -d '{ "email": "bob@dylan.com" }' ; echo ""
+[adrian@Thinkbook15 alx-files_manager]$  curl 0.0.0.0:5000/users -XPOST -H "Content-Type: application/json" -d '{ "email": "bob@dylan.com" }' ; echo ""
 {"error":"Missing password"}
-bob@dylan:~$ 
+{"error":"Missing password"}
+bash: {error:Missing password}: command not found 
 ```
 
 These commands demonstrate successful user creation, database storage, error handling for existing users, and error handling for missing password.
