@@ -37,3 +37,15 @@ This module provides a RedisClient class for interacting with a Redis datastore.
   - **Parameters**
     - `key` (string): The key to delete.
 - **Returns:** `undefined`
+
+## Task 1: MongoDB Utility
+
+## Description
+
+This task implements a MongoDB utility class (`DBClient`) for a file management system. It provides basic database operations and connection management.
+
+## MongoDB Features
+
+- Establishes connection to MongoDB
+- Checks database connection status
+- Counts documents in users and files collections
