@@ -289,3 +289,73 @@ This task implements user authentication endpoints in the Files Manager API. It 
 - `sha1`: For password hashing
 
 Ensure all dependencies are installed by running:
+
+## Task 5: File Upload Endpoint
+
+## Overview for Task 5
+
+This task implements a new endpoint for file uploads in our Files Manager API. It allows users to upload files, create folders, and manage their file structure.
+
+## Implementation Details for Task 5
+
+### New Endpoint
+
+- **POST /files**
+  - Controller: `FilesController.postUpload`
+  - Purpose: Create a new file or folder in the database and on disk
+
+### Files Modified/Created for Task 5
+
+1. `routes/index.js`: Added new route for file upload
+2. `controllers/FilesController.js`: Implemented file upload logic
+
+## Functionality
+
+The new endpoint handles the following:
+
+1. User authentication via token
+2. File/folder creation with attributes:
+   - name
+   - type (folder, file, or image)
+   - parentId (optional)
+   - isPublic (optional)
+   - data (required for file/image, Base64 encoded)
+3. Input validation
+4. Parent folder validation (if parentId is provided)
+5. File storage on disk (for file/image types)
+6. Database entry creation
+
+## Testing and Usage Examples
+
+```bash
+[adrian@Thinkbook15 alx-files_manager]$ curl 0.0.0.0:5000/connect -H "Authorization: Basic Ym9iQGR5bGFuLmNvbTp0b3RvMTIzNCE=" ; echo ""
+{"token":"c881d13f-df66-4b4f-ada1-1e7726626dd2"}
+
+[adrian@Thinkbook15 alx-files_manager]$ curl -XPOST 0.0.0.0:5000/files -H "X-Token: c881d13f-df66-4b4f-ada1-1e7726626dd2" -H "Content-Type: application/json" -d '{ "name": "myText.txt", "type": "fil
+e", "data": "SGVsbG8gV2Vic3RhY2shCg==" }' ; echo ""
+{"id":"670ab14779db5b094520cf8b","userId":"670a9abf51078577bf0af2fc","name":"myText.txt","type":"file","isPublic":false,"parentId":0}
+
+[adrian@Thinkbook15 alx-files_manager]$ ls /tmp/files_manager/
+94392418-53ed-4693-b8f5-a868a2745d63
+
+[adrian@Thinkbook15 alx-files_manager]$ cat /tmp/files_manager/94392418-53ed-4693-b8f5-a868a2745d63
+Hello Webstack!
+
+[adrian@Thinkbook15 alx-files_manager]$ curl -XPOST 0.0.0.0:5000/files -H "X-Token: c881d13f-df66-4b4f-ada1-1e7726626dd2" -H "Content-Type: application/json" -d '{ "name": "images", "type": "folder"
+ }' ; echo ""
+{"id":"670ab1bc79db5b094520cf8c","userId":"670a9abf51078577bf0af2fc","name":"images","type":"folder","isPublic":false,"parentId":0}
+
+[adrian@Thinkbook15 alx-files_manager]$ python image_upload.py image.png c881d13f-df66-4b4f-ada1-1e7726626dd2 670ab1bc79db5b094520cf8c
+{'id': '670ab56202de602382f3e697', 'userId': '670a9abf51078577bf0af2fc', 'name': 'image.png', 'type': 'image', 'isPublic': True, 'parentId': '670ab1bc79db5b094520cf8c'}
+[adrian@Thinkbook15 alx-files_manager]$ echo 'db.files.find()' | mongo files_manager
+MongoDB shell version v3.6.23
+connecting to: mongodb://127.0.0.1:27017/files_manager?gssapiServiceName=mongodb
+Implicit session: session { "id" : UUID("e78020df-41b5-4740-990a-80b2a150cbf3") }
+MongoDB server version: 3.6.23
+{ "_id" : ObjectId("670ab14779db5b094520cf8b"), "userId" : ObjectId("670a9abf51078577bf0af2fc"), "name" : "myText.txt", "type" : "file", "isPublic" : false, "parentId" : "0", "localPath" : "/tmp/files_manager/94392418-53ed-4693-b8f5-a868a2745d63" }
+{ "_id" : ObjectId("670ab1bc79db5b094520cf8c"), "userId" : ObjectId("670a9abf51078577bf0af2fc"), "name" : "images", "type" : "folder", "isPublic" : false, "parentId" : "0" }
+{ "_id" : ObjectId("670ab56202de602382f3e697"), "userId" : ObjectId("670a9abf51078577bf0af2fc"), "name" : "image.png", "type" : "image", "isPublic" : true, "parentId" : ObjectId("670ab1bc79db5b094520cf8c"), "localPath" : "/tmp/files_manager/fed669e4-e16e-46e8-a591-146f2972c54d" }
+bye
+[adrian@Thinkbook15 alx-files_manager]$ ls /tmp/files_manager/
+94392418-53ed-4693-b8f5-a868a2745d63  fed669e4-e16e-46e8-a591-146f2972c54d
+
