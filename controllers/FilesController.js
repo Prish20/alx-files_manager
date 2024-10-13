@@ -110,7 +110,15 @@ class FilesController {
       return res.status(404).json({ error: 'Not found' });
     }
 
-    return res.status(200).json(file);
+    // Transform the file object
+    const { _id, localPath, ...rest } = file;
+    const transformedFile = {
+      id: _id.toString(),
+      ...rest,
+      parentId: rest.parentId === '0' ? 0 : rest.parentId,
+    };
+
+    return res.status(200).json(transformedFile);
   }
 
   static async getIndex(req, res) {
@@ -132,12 +140,23 @@ class FilesController {
     const files = await dbClient.db.collection('files')
       .aggregate([
         { $match: query },
+        { $project: { localPath: 0 } },
         { $skip: page * pageSize },
         { $limit: pageSize },
       ])
       .toArray();
 
-    return res.status(200).json(files);
+    // Transform the files array
+    const transformedFiles = files.map((file) => {
+      const { _id, ...rest } = file;
+      return {
+        id: _id.toString(),
+        ...rest,
+        parentId: rest.parentId === '0' ? 0 : rest.parentId,
+      };
+    });
+
+    return res.status(200).json(transformedFiles);
   }
 }
 

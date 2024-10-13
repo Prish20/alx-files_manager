@@ -359,7 +359,7 @@ bye
 [adrian@Thinkbook15 alx-files_manager]$ ls /tmp/files_manager/
 94392418-53ed-4693-b8f5-a868a2745d63  fed669e4-e16e-46e8-a591-146f2972c54d
 
-# Task 6: Get and List Files
+## Task 6: Get and List Files
 
 ## Objective
 Implement endpoints to retrieve individual file documents and list file documents with pagination and filtering options.
