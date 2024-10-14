@@ -1,6 +1,9 @@
 import sha1 from 'sha1';
+import Queue from 'bull';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
+
+const userQueue = new Queue('userQueue');
 
 class UsersController {
   /**
@@ -43,11 +46,12 @@ class UsersController {
       password: hashedPassword,
     });
 
-    /** Return the new user's id and email */
-    return res.status(201).json({
-      id: result.insertedId.toString(),
-      email,
-    });
+    const userId = result.insertedId;
+
+    // Add job to userQueue
+    userQueue.add({ userId: userId.toString() });
+
+    return res.status(201).json({ id: userId, email });
   }
 
   /**
