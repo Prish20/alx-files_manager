@@ -26,5 +26,12 @@ router.post('/files', FilesController.postUpload);
 router.get('/files/:id', FilesController.getShow);
 router.get('/files', FilesController.getIndex);
 
+/** Define new routes for publishing and unpublishing files */
+router.put('/files/:id/publish', FilesController.putPublish);
+router.put('/files/:id/unpublish', FilesController.putUnpublish);
+
+/** Define new route for getting file data */
+router.get('/files/:id/data', FilesController.getFile);
+
 /** Export the router for use in the main app */
 export default router;
